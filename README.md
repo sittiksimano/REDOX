@@ -30,6 +30,9 @@ $ mv redox /usr/local/bin
   1. Faster
   2. Reliable 
   
+# Project Aim :
+It will display the open ports, and if any open ports on 80 http are found, it will crawl all directories of the given target. Following that, it detects web technologies such as content management systems (CMS), blogging platforms, statistical/analytics packages, JavaScript libraries, web servers, and embedded devices. Finally, it checks for CVEs (or displays you Vulnerabilities) and then performs doxing (dumping information such as ISP name, city or state name, zip code, location, time zone, and many more) on the host IP.
+  
 # Creator
   Abubakkar Khan Fazla Rabbi
   (Web Penetration Tester & Security Analyzer)
