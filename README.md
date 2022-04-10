@@ -1,3 +1,4 @@
+![image](https://user-images.githubusercontent.com/24763414/162615594-f22742ff-2794-4085-95c6-f98a56f9daa1.png)
 
 # REDOX
 REDOX is an automated reconnaissance tool meant for gathering information during penetration testing of web applications.
