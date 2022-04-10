@@ -1,0 +1,96 @@
+#!/bin/bash
+figlet ReDox
+echo -e "                           By"
+echo -e "                                 H4x0r Abub4kk3r\n"
+echo "Automated Websites Reconnaissance and Doxing for Penetration Testing"
+echo "No System Is Safe"
+echo "--------------------------------------------------------"
+if [ "$1" == "" ]
+then
+	echo "Usage: $0 IP"
+	exit 1
+fi
+
+printf "\n -_-_-_-_-_-_-_-_-_ NMAP -_-_-_-_-_-_-_-_-_ \n\n" > results
+
+echo "Running Nmap..."
+nmap $1 -F --open | head -n -3 >> results
+#With specific Ports like -p 21-25,80-85,139,8080 or By name -p ftp,udp,tcp,http,https
+
+while read line
+do
+        if [[ $line == *open* ]] && [[ $line == *http* ]]
+        then
+        echo "Running Gobuster..."
+        gobuster dir -u $1 -w /usr/share/wordlists/dirb/common.txt -qz > temp1
+#use -d if_you_want more results with backup files and --wildcard  Force continued operation when wildcard found  (time consuming)
+
+        echo "Running WhatWeb..."
+        whatweb $1 -v > temp2
+
+#Now testing for CVE related bugs
+	echo "Now Testing For CVE Bugs"
+        shodan host $1 > temp3
+
+	fi
+done < results
+
+if [ -e temp1 ]
+then
+        printf "\n -_-_-_-_-_-_-_-_-_  DIRS -_-_-_-_-_-_-_-_-_ \n\n" >> results
+        cat temp1 >> results
+        rm temp1
+fi
+
+if [ -e temp2 ]
+then
+    printf "\n -_-_-_-_-_-_-_-_-_  WhatWeb -_-_-_-_-_-_-_-_-_ \n\n" >> results
+        cat temp2 >> results
+        rm temp2
+fi
+
+if [ -e temp3 ]
+then
+	printf "\n -_-_-_-_-_-_-_-_-_ CVE BUGS -_-_-_-_-_-_-_-_-_  \n\n" >> results
+	cat temp3 >> results
+	rm temp3
+fi
+
+cat results
+
+echo -e "\n--------------------------------------------------------"
+echo "*************** Now Doxing Ip Address ******************"
+echo "--------------------------------------------------------"
+res=$(curl http://ip-api.com/json/$1 -s)
+status=$(echo $res | jq '.status' -r)
+if [[ $status == "success" ]] 
+then 
+	city=$(echo $res | jq '.city' -r)
+echo "CITY:" $city >> results
+region=$(echo $res | jq '.regionName' -r)
+echo "REGION:" $region
+zip=$(echo $res | jq '.zip' -r)
+echo "ZIP CODE:" $zip
+lat=$(echo $res | jq '.lat' -r)
+echo "LATITUDE:" $lat
+lon=$(echo $res | jq '.lon' -r)
+echo "LONGITUDE:"  $lon
+timezone=$(echo $res | jq '.timezone' -r)
+echo "TIMEZONE:" $timezone
+isp=$(echo $res | jq '.isp' -r)
+echo "ISP:" $isp
+org=$(echo $res | jq '.org' -r)
+echo "ORGANIZATION:" $org
+as=$(echo $res | jq '.as' -r)
+echo "AS:" $as
+query=$(echo $res | jq '.query' -r)
+echo "QUERY:" $query
+
+
+#Do not copy my code(201-002-211)
+#if you face any problem with jq install it : apt-get install jq -y
+
+printf "\n\nTesting Done!! For $1 \n\n"
+
+fi
+
