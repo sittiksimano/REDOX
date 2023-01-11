@@ -5,16 +5,47 @@ echo -e "                                 H4x0r Abub4kk3r\n"
 echo "Automated Websites Reconnaissance and Doxing for Penetration Testing"
 echo "No System Is Safe"
 echo "--------------------------------------------------------"
-if [ "$1" == "" ]
-then
-	echo "Usage: $0 IP"
-	exit 1
+#Checking for necessary tools
+
+if ! command -v nmap > /dev/null; then
+    echo "Error: nmap is not installed"
+    exit 1
+fi
+if ! command -v gobuster > /dev/null; then
+    echo "Error: gobuster is not installed"
+    exit 1
+fi
+if ! command -v whatweb > /dev/null; then
+    echo "Error: whatweb is not installed"
+    exit 1
+fi
+if ! command -v jq > /dev/null; then
+    echo "Error: jq is not installed"
+    exit 1
 fi
 
+if [[ "$#" -ne 1 ]] || ! [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Usage: $0 IP_ADDRESS"
+    exit 1
+fi
+
+read -p "Enter number of decoy IPs: " num_decoys
+
+if [ $num_decoys -lt 2 ]; then
+    echo "Enter at least 2 decoy IPs."
+    exit 1
+fi
+
+for ((i=1; i<=$num_decoys; i++)); do
+    read -p "Enter decoy IP $i: " decoy_ip
+    decoy_list+="$decoy_ip,"
+done
+
+decoys=${decoy_list%?}
 printf "\n -_-_-_-_-_-_-_-_-_ NMAP -_-_-_-_-_-_-_-_-_ \n\n" > results
 
 echo "Running Nmap..."
-nmap $1 -F --open | head -n -3 >> results
+nmap -T5 -F --open -n -Pn --min-rate=50 $1 -D $decoys -data-length 20 --scan-delay 2s | grep "^[0-9]*\/.*open.*" >>results
 #With specific Ports like -p 21-25,80-85,139,8080 or By name -p ftp,udp,tcp,http,https
 
 while read line
